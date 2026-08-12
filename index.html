@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>[ NOME ] — Caderno de Trabalhos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Reenie+Beanie&family=Indie+Flower&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+<style>
+
+/* ─── RESET ─────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { height: 100%; }
+body {
+  min-height: 100%;
+  background: #D6CFBF;  /* mesa de madeira clara */
+  background-image:
+    radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.15) 0%, transparent 60%),
+    repeating-linear-gradient(
+      90deg,
+      transparent, transparent 60px,
+      rgba(0,0,0,0.015) 60px, rgba(0,0,0,0.015) 61px
+    );
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 3vw 2vw;
+  font-family: 'Indie Flower', cursive;
+  overflow-x: hidden;
+}
+
+/* ─── CADERNO — WRAPPER ─────────────────────────────────── */
+.notebook {
+  position: relative;
+  width: min(980px, 96vw);
+  display: flex;
+  flex-direction: row;
+  filter: drop-shadow(0 20px 60px rgba(0,0,0,0.32)) drop-shadow(0 4px 12px rgba(0,0,0,0.18));
+}
+
+/* ─── ESPIRAL LATERAL ───────────────────────────────────── */
+.spiral {
+  position: relative;
+  width: 36px;
+  flex-shrink: 0;
+  background: #C8C0B4;
+  border-radius: 8px 0 0 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 18px 0;
+  gap: 0;
+  z-index: 10;
+  box-shadow: inset -3px 0 8px rgba(0,0,0,0.12);
+}
+
+.spiral__ring {
+  width: 28px;
+  height: 20px;
+  border: 3.5px solid #8A8278;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: #B0A898;
+  position: relative;
+  flex-shrink: 0;
+  box-shadow:
+    inset 0 2px 3px rgba(255,255,255,0.3),
+    inset 0 -2px 3px rgba(0,0,0,0.15),
+    2px 0 4px rgba(0,0,0,0.2);
+  /* little highlight on top of ring */
+}
+.spiral__ring::before {
+  content: '';
+  position: absolute;
+  top: 2px; left: 4px; right: 4px;
+  height: 4px;
+  background: rgba(255,255,255,0.4);
+  border-radius: 2px;
+}
+
+/* ─── PÁGINAS ───────────────────────────────────────────── */
+.pages {
+  flex: 1;
+  position: relative;
+  min-height: 640px;
+}
+
+/* Uma "page" = toda a área de conteúdo */
+.page {
+  display: none;
+  width: 100%;
+  min-height: 640px;
+  position: relative;
+  background: #F7F3EB;
+  /* Ruled lines */
+  background-image:
+    /* red margin line */
+    linear-gradient(90deg, transparent 68px, rgba(200,80,80,0.18) 68px, rgba(200,80,80,0.18) 70px, transparent 70px),
+    /* blue ruled lines */
+    repeating-linear-gradient(
+      180deg,
+      transparent,
+      transparent 27px,
+      rgba(100,130,180,0.13) 27px,
+      rgba(100,130,180,0.13) 28px
+    );
+  border-radius: 0 6px 6px 0;
+  overflow: hidden;
+}
+
+.page.is-active { display: block; }
+
+/* Page flip animation */
+.page.flip-in {
+  animation: flipIn 0.35s ease both;
+}
+@keyframes flipIn {
+  from { opacity: 0; transform: perspective(800px) rotateY(-8deg) translateX(-20px); }
+  to   { opacity: 1; transform: perspective(800px) rotateY(0deg) translateX(0); }
+}
+
+/* Top strip (like a header band of the page) */
+.page__header {
+  background: transparent;
+  padding: 28px 36px 16px 88px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: 2px solid rgba(100,130,180,0.13);
+  position: relative;
+}
+
+.page__label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: rgba(60,50,40,0.35);
+  text-transform: uppercase;
+}
+
+.page__date {
+  font-family: 'Indie Flower', cursive;
+  font-size: 13px;
+  color: rgba(60,50,40,0.3);
+}
+
+/* Inner content area */
+.page__body {
+  padding: 24px 40px 40px 88px;
+  position: relative;
+}
+
+/* ─── ABAS LATERAIS (tabs) ──────────────────────────────── */
+.tabs {
+  position: absolute;
+  right: -44px;
+  top: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 20;
+}
+
+.tab {
+  width: 50px;
+  height: 44px;
+  border-radius: 0 8px 8px 0;
+  cursor: pointer;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 8px;
+  position: relative;
+  transition: width 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 2px 2px 6px rgba(0,0,0,0.18);
+  font-family: 'Space Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  color: rgba(0,0,0,0.5);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  text-transform: uppercase;
+}
+
+.tab:hover { width: 56px; }
+.tab.is-active {
+  width: 60px;
+  box-shadow: 3px 3px 10px rgba(0,0,0,0.25);
+  color: rgba(0,0,0,0.7);
+  font-weight: 700;
+}
+
+/* Tab colors — like colored sticky-note dividers */
+.tab[data-page="capa"]          { background: #F5C842; }
+.tab[data-page="casamentos"]    { background: #F2956A; }
+.tab[data-page="eventos"]       { background: #7BBFAA; }
+.tab[data-page="institucionais"]{ background: #9BB5D4; }
+.tab[data-page="redes"]         { background: #C9A0DC; }
+.tab[data-page="sobre"]         { background: #E8A0A0; }
+.tab[data-page="contato"]       { background: #A8C87A; }
+
+/* ─── CAPA ──────────────────────────────────────────────── */
+#page-capa .page__body {
+  padding-top: 40px;
+  min-height: 560px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.cover-sticker {
+  position: absolute;
+  top: 60px;
+  right: 60px;
+  width: 110px;
+  height: 110px;
+  background: #F5C842;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 10px;
+  transform: rotate(12deg);
+  box-shadow: 2px 3px 8px rgba(0,0,0,0.18);
+  font-family: 'Indie Flower', cursive;
+  font-size: 13px;
+  line-height: 1.3;
+  color: #3D2E00;
+}
+
+.cover-tape {
+  position: absolute;
+  width: 90px;
+  height: 22px;
+  background: rgba(240, 220, 160, 0.65);
+  border-radius: 2px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  transform: rotate(-3deg);
+}
+.cover-tape--a { top: 28px; left: 180px; transform: rotate(-2deg); }
+.cover-tape--b { bottom: 80px; right: 100px; transform: rotate(4deg); width: 60px; }
+
+.cover-title {
+  font-family: 'Reenie Beanie', cursive;
+  font-size: clamp(4rem, 10vw, 7.5rem);
+  line-height: 0.95;
+  color: #1A2E4A;
+  transform: rotate(-1.5deg);
+  transform-origin: left bottom;
+  margin-bottom: 0.5rem;
+  position: relative;
+  display: inline-block;
+}
+/* Underline com caneta */
+.cover-title::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 0; right: 0;
+  height: 3px;
+  background: #C0392B;
+  border-radius: 2px;
+  transform: rotate(-0.3deg) skewX(-4deg);
+  opacity: 0.7;
+}
+
+.cover-sub {
+  font-family: 'Indie Flower', cursive;
+  font-size: 18px;
+  color: #5A4A3A;
+  margin-top: 1.5rem;
+  transform: rotate(-0.5deg);
+}
+
+.cover-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: auto;
+}
+.cover-meta__item {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: #8A7A6A;
+  letter-spacing: 0.05em;
+}
+.cover-meta__item strong {
+  color: #3D3530;
+  font-weight: 700;
+}
+
+/* Doodle decorations on cover */
+.doodle {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0.18;
+}
+.doodle--camera {
+  right: 50px;
+  bottom: 120px;
+  font-size: 64px;
+  transform: rotate(15deg);
+  opacity: 0.1;
+}
+.doodle--star {
+  top: 140px;
+  left: 200px;
+  font-size: 28px;
+  transform: rotate(-20deg);
+  opacity: 0.15;
+}
+.doodle--arrow {
+  bottom: 180px;
+  left: 300px;
+  font-size: 22px;
+  transform: rotate(40deg);
+  opacity: 0.12;
+}
+
+/* ─── SEÇÕES DE TRABALHO (portfolio pages) ──────────────── */
+.work-page .page__body {
+  min-height: 560px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  padding-bottom: 40px;
+}
+
+.work-text { display: flex; flex-direction: column; gap: 14px; }
+
+.work-number {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: rgba(60,50,40,0.3);
+  letter-spacing: 0.12em;
+}
+
+.work-title {
+  font-family: 'Reenie Beanie', cursive;
+  font-size: clamp(2.8rem, 6vw, 4.5rem);
+  color: #1A2E4A;
+  line-height: 1;
+  transform: rotate(-0.8deg);
+  position: relative;
+  display: inline-block;
+}
+
+/* Highlight marker */
+.work-title::before {
+  content: '';
+  position: absolute;
+  left: -2px; right: -2px;
+  bottom: 2px;
+  height: 10px;
+  background: rgba(245,200,66,0.45);
+  z-index: -1;
+  transform: skewX(-4deg);
+  border-radius: 1px;
+}
+
+.work-desc {
+  font-size: 15px;
+  color: #5A4A3A;
+  line-height: 1.7;
+  max-width: 30ch;
+}
+
+.work-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: #C0392B;
+  text-decoration: none;
+  text-transform: uppercase;
+  margin-top: 8px;
+  border-bottom: 1.5px solid rgba(192,57,43,0.35);
+  padding-bottom: 2px;
+  align-self: flex-start;
+  transition: color 0.2s, border-color 0.2s;
+}
+.work-cta:hover { color: #1A2E4A; border-color: #1A2E4A; }
+
+/* Post-it note que descola levemente */
+.postit {
+  background: #F5C842;
+  padding: 14px 16px;
+  transform: rotate(2deg);
+  box-shadow: 2px 3px 10px rgba(0,0,0,0.15), inset 0 -20px 30px rgba(0,0,0,0.04);
+  font-size: 13px;
+  color: #3D2E00;
+  line-height: 1.5;
+  margin-top: 8px;
+  align-self: flex-start;
+  position: relative;
+}
+/* Fold corner */
+.postit::after {
+  content: '';
+  position: absolute;
+  bottom: 0; right: 0;
+  width: 18px; height: 18px;
+  background: linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.08) 50%);
+}
+
+/* ─── VÍDEO PLACEHOLDERS ────────────────────────────────── */
+.work-videos {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.work-videos--row {
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+.video-card {
+  position: relative;
+  flex: 1;
+  background: #EBE4D6;
+  border: 2px solid rgba(60,50,40,0.15);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow:
+    3px 3px 0 rgba(60,50,40,0.12),
+    5px 5px 0 rgba(60,50,40,0.07);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  cursor: pointer;
+}
+.video-card:nth-child(odd)  { transform: rotate(-0.8deg); }
+.video-card:nth-child(even) { transform: rotate(0.6deg); margin-top: 12px; }
+.video-card:hover {
+  transform: rotate(0deg) scale(1.02) !important;
+  box-shadow: 5px 5px 0 rgba(60,50,40,0.18), 8px 8px 0 rgba(60,50,40,0.09);
+}
+
+/* Tape on top of cards */
+.video-card::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%) rotate(1deg);
+  width: 50px;
+  height: 14px;
+  background: rgba(240,220,160,0.7);
+  border-radius: 1px;
+  z-index: 2;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+}
+
+.video-card__inner {
+  aspect-ratio: 9 / 14;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px;
+  position: relative;
+}
+
+/* X placeholder lines */
+.video-card__inner::before,
+.video-card__inner::after {
+  content: '';
+  position: absolute;
+  background: rgba(60,50,40,0.08);
+  border-radius: 1px;
+}
+.video-card__inner::before { width: 2px; top: 8%; bottom: 8%; left: 50%; transform: rotate(6deg); }
+.video-card__inner::after  { height: 2px; left: 8%; right: 8%; top: 50%; transform: rotate(-3deg); }
+
+.video-card__label {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  color: rgba(60,50,40,0.35);
+  letter-spacing: 0.1em;
+  position: relative;
+  z-index: 1;
+  background: #EBE4D6;
+  padding: 2px 6px;
+  border: 1px dashed rgba(60,50,40,0.2);
+  transform: rotate(-1deg);
+}
+
+.video-card__play {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  background: #1A2E4A;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #F7F3EB;
+  z-index: 3;
+  transform: rotate(4deg);
+  transition: transform 0.2s, background 0.2s;
+}
+.video-card:hover .video-card__play {
+  transform: rotate(0deg) scale(1.1);
+  background: #C0392B;
+}
+
+/* ─── SOBRE ─────────────────────────────────────────────── */
+#page-sobre .page__body {
+  min-height: 560px;
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+.about-photo-slot {
+  position: relative;
+}
+
+.about-photo-frame {
+  width: 100%;
+  aspect-ratio: 3/4;
+  background: #D8D0C4;
+  border: 3px solid rgba(60,50,40,0.18);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 4px 5px 0 rgba(60,50,40,0.12), 7px 8px 0 rgba(60,50,40,0.06);
+  transform: rotate(-2deg);
+  position: relative;
+  overflow: hidden;
+}
+.about-photo-frame::before,
+.about-photo-frame::after {
+  content: '';
+  position: absolute;
+  background: rgba(60,50,40,0.08);
+  border-radius: 1px;
+}
+.about-photo-frame::before { width: 2px; top: 8%; bottom: 8%; left: 50%; transform: rotate(5deg); }
+.about-photo-frame::after  { height: 2px; left: 8%; right: 8%; top: 50%; transform: rotate(-3deg); }
+
+.about-photo-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  color: rgba(60,50,40,0.3);
+  letter-spacing: 0.1em;
+  position: relative;
+  z-index: 1;
+  background: #D8D0C4;
+  padding: 2px 6px;
+  border: 1px dashed rgba(60,50,40,0.18);
+}
+
+/* Tape on photo */
+.about-tape {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-1.5deg);
+  width: 60px;
+  height: 16px;
+  background: rgba(240,220,160,0.7);
+  border-radius: 1px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  z-index: 5;
+}
+
+.about-text-area { display: flex; flex-direction: column; gap: 16px; }
+
+.about-title {
+  font-family: 'Reenie Beanie', cursive;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  color: #1A2E4A;
+  transform: rotate(-0.6deg);
+}
+
+.about-body {
+  font-size: 15px;
+  color: #5A4A3A;
+  line-height: 1.75;
+  max-width: 44ch;
+}
+
+.about-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+.about-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #F7F3EB;
+  background: #1A2E4A;
+  padding: 4px 10px;
+  border-radius: 2px;
+}
+.about-tag:nth-child(2) { background: #C0392B; }
+.about-tag:nth-child(3) { background: #5A7A4A; }
+
+/* ─── CONTATO ───────────────────────────────────────────── */
+#page-contato .page__body {
+  min-height: 560px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 32px;
+}
+
+.contact-title {
+  font-family: 'Reenie Beanie', cursive;
+  font-size: clamp(3.5rem, 8vw, 6rem);
+  color: #1A2E4A;
+  line-height: 0.95;
+  transform: rotate(-1.2deg);
+  transform-origin: left;
+}
+
+.contact-eyebrow {
+  font-family: 'Indie Flower', cursive;
+  font-size: 15px;
+  color: #8A7A6A;
+  margin-bottom: -8px;
+  transform: rotate(-0.4deg);
+}
+
+.contact-list { display: flex; flex-direction: column; gap: 0; }
+
+.contact-item {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1.5px solid rgba(100,130,180,0.18);
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 0.2s;
+  position: relative;
+}
+.contact-item:first-child { border-top: 1.5px solid rgba(100,130,180,0.18); }
+.contact-item:hover { opacity: 0.7; }
+
+.contact-item__label {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #8A7A6A;
+  min-width: 80px;
+}
+
+.contact-item__value {
+  font-family: 'Reenie Beanie', cursive;
+  font-size: 2rem;
+  color: #1A2E4A;
+}
+
+/* Little arrow doodle before each */
+.contact-item__arrow {
+  font-family: 'Indie Flower', cursive;
+  color: #C0392B;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+/* ─── RODAPÉ DE CADA PÁGINA ─────────────────────────────── */
+.page__footer {
+  position: absolute;
+  bottom: 14px;
+  left: 88px;
+  right: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  color: rgba(60,50,40,0.22);
+  letter-spacing: 0.1em;
+  border-top: 1px solid rgba(100,130,180,0.1);
+  padding-top: 6px;
+}
+
+/* ─── MOBILE ─────────────────────────────────────────────── */
+@media (max-width: 700px) {
+  body { padding: 12px 4px; }
+
+  .notebook { flex-direction: column; width: 100%; }
+
+  .spiral {
+    width: 100%;
+    height: 28px;
+    flex-direction: row;
+    border-radius: 8px 8px 0 0;
+    padding: 0 12px;
+    gap: 0;
+    justify-content: space-around;
+    align-items: center;
+  }
+  .spiral__ring {
+    width: 18px;
+    height: 18px;
+  }
+
+  .page { border-radius: 0 0 6px 6px; }
+  .page__body { padding: 16px 16px 60px 28px; }
+  .page__header { padding: 16px 16px 10px 28px; }
+
+  .work-page .page__body {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .work-videos--row { flex-direction: column; }
+  .video-card:nth-child(even) { margin-top: 0; }
+
+  #page-sobre .page__body {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .about-photo-frame { max-width: 180px; }
+
+  .tabs {
+    right: auto;
+    left: 0;
+    top: auto;
+    bottom: -52px;
+    flex-direction: row;
+    gap: 4px;
+  }
+  .tab {
+    width: 44px;
+    height: 48px;
+    border-radius: 0 0 8px 8px;
+    writing-mode: horizontal-tb;
+    font-size: 7px;
+    padding: 0 0 8px;
+    justify-content: center;
+    align-items: flex-end;
+  }
+  .tab:hover { width: 44px; height: 54px; }
+  .tab.is-active { height: 56px; }
+
+  .contact-item__value { font-size: 1.5rem; }
+  .cover-sticker { width: 80px; height: 80px; font-size: 10px; top: 40px; right: 20px; }
+}
+
+/* ─── FOCUS ───────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid #1A2E4A;
+  outline-offset: 3px;
+}
+
+/* ─── REDUCED MOTION ─────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .page.flip-in { animation: none; }
+  * { transition-duration: 0.01ms !important; }
+}
+
+</style>
+</head>
+<body>
+
+<div class="notebook">
+
+  <!-- ── ESPIRAL ─────────────────────────────────────────── -->
+  <div class="spiral" aria-hidden="true">
+    <!-- 18 rings -->
+    <div class="spiral__ring"></div><div class="spiral__ring"></div>
+    <div class="spiral__ring"></div><div class="spiral__ring"></div>
+    <div class="spiral__ring"></div><div class="spiral__ring"></div>
+    <div class="spiral__ring"></div><div class="spiral__ring"></div>
+    <div class="spiral__ring"></div><div class="spiral__ring"></div>
+    <div class="spiral__ring"></div><div class="spiral__ring"></div>
+    <div class="spiral__ring"></div><div class="spiral__ring"></div>
+    <div class="spiral__ring"></div><div class="spiral__ring"></div>
+    <div class="spiral__ring"></div><div class="spiral__ring"></div>
+  </div>
+
+  <!-- ── PÁGINAS ─────────────────────────────────────────── -->
+  <div class="pages">
+
+    <!-- ABAS -->
+    <div class="tabs" role="tablist" aria-label="Seções do portfólio">
+      <button class="tab is-active" data-page="capa"           role="tab" aria-selected="true"  aria-controls="page-capa">Capa</button>
+      <button class="tab"           data-page="casamentos"     role="tab" aria-selected="false" aria-controls="page-casamentos">Casam.</button>
+      <button class="tab"           data-page="eventos"        role="tab" aria-selected="false" aria-controls="page-eventos">Eventos</button>
+      <button class="tab"           data-page="institucionais" role="tab" aria-selected="false" aria-controls="page-institucionais">Instit.</button>
+      <button class="tab"           data-page="redes"          role="tab" aria-selected="false" aria-controls="page-redes">Redes</button>
+      <button class="tab"           data-page="sobre"          role="tab" aria-selected="false" aria-controls="page-sobre">Sobre</button>
+      <button class="tab"           data-page="contato"        role="tab" aria-selected="false" aria-controls="page-contato">Contato</button>
+    </div>
+
+    <!-- ── PÁGINA: CAPA ──────────────────────────────────── -->
+    <div class="page is-active" id="page-capa" role="tabpanel">
+      <div class="page__header">
+        <span class="page__label">Portfólio Audiovisual</span>
+        <span class="page__date">2024 — 2025</span>
+      </div>
+
+      <div class="page__body">
+        <!-- Fita adesiva decorativa -->
+        <div class="cover-tape cover-tape--a" aria-hidden="true"></div>
+        <div class="cover-tape cover-tape--b" aria-hidden="true"></div>
+
+        <!-- Adesivo circular -->
+        <div class="cover-sticker" aria-hidden="true">
+          Videomaker<br/>&amp;<br/>Creator
+        </div>
+
+        <!-- Doodles -->
+        <span class="doodle doodle--camera" aria-hidden="true">📷</span>
+        <span class="doodle doodle--star"   aria-hidden="true">★</span>
+        <span class="doodle doodle--arrow"  aria-hidden="true">➜</span>
+
+        <div>
+          <h1 class="cover-title">PORTFÓLIO</h1>
+          <p class="cover-sub">[ NOME DO PROFISSIONAL ]<br/>Casamentos · Eventos · Institucionais · Redes</p>
+        </div>
+
+        <div class="cover-meta">
+          <span class="cover-meta__item"><strong>Cidade:</strong> [ CIDADE ]</span>
+          <span class="cover-meta__item"><strong>Instagram:</strong> @[ INSTAGRAM ]</span>
+          <span class="cover-meta__item"><strong>WhatsApp:</strong> [ WHATSAPP ]</span>
+          <span class="cover-meta__item" style="margin-top:6px;font-size:9px;opacity:0.6;">use as abas → para navegar</span>
+        </div>
+      </div>
+
+      <div class="page__footer">
+        <span>[ NOME DO PROFISSIONAL ]</span>
+        <span>pág. 01</span>
+      </div>
+    </div>
+
+    <!-- ── PÁGINA: CASAMENTOS ─────────────────────────────── -->
+    <div class="page work-page" id="page-casamentos" role="tabpanel" aria-hidden="true">
+      <div class="page__header">
+        <span class="page__label">Casamentos</span>
+        <span class="page__date">2024</span>
+      </div>
+
+      <div class="page__body">
+        <div class="work-text">
+          <span class="work-number">01 / 04</span>
+          <h2 class="work-title">CASAMENTOS</h2>
+          <p class="work-desc">
+            Cada casamento carrega uma história única. Registro com sensibilidade os momentos que definem o dia mais importante da sua vida — do detalhe ao abraço final.
+          </p>
+          <a href="#" class="work-cta" onclick="return false">→ entrar em contato</a>
+
+          <div class="postit">
+            "O vídeo ficou lindo,<br/>
+            melhor que imaginava!"<br/>
+            <small style="opacity:0.6">— noiva, 2024</small>
+          </div>
+        </div>
+
+        <div class="work-videos work-videos--row">
+          <div class="video-card">
+            <div class="video-card__inner">
+              <span class="video-card__label">[ VÍDEO 01 ]</span>
+            </div>
+            <button class="video-card__play" aria-label="Reproduzir vídeo">
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+                <polygon points="5,3 17,10 5,17" fill="currentColor"/>
+              </svg>
+            </button>
+          </div>
+          <div class="video-card">
+            <div class="video-card__inner">
+              <span class="video-card__label">[ VÍDEO 02 ]</span>
+            </div>
+            <button class="video-card__play" aria-label="Reproduzir vídeo">
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+                <polygon points="5,3 17,10 5,17" fill="currentColor"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="page__footer">
+        <span>[ NOME DO PROFISSIONAL ]</span>
+        <span>pág. 02</span>
+      </div>
+    </div>
+
+    <!-- ── PÁGINA: EVENTOS ────────────────────────────────── -->
+    <div class="page work-page" id="page-eventos" role="tabpanel" aria-hidden="true">
+      <div class="page__header">
+        <span class="page__label">Eventos</span>
+        <span class="page__date">2024</span>
+      </div>
+
+      <div class="page__body">
+        <div class="work-text">
+          <span class="work-number">02 / 04</span>
+          <h2 class="work-title">EVENTOS</h2>
+          <p class="work-desc">
+            Shows, festivais, corporativos e celebrações. Capturo a energia e a atmosfera de cada evento com agilidade e precisão visual.
+          </p>
+          <a href="#" class="work-cta" onclick="return false">→ entrar em contato</a>
+        </div>
+
+        <div class="work-videos work-videos--row">
+          <div class="video-card">
+            <div class="video-card__inner">
+              <span class="video-card__label">[ VÍDEO 01 ]</span>
+            </div>
+            <button class="video-card__play" aria-label="Reproduzir vídeo">
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+                <polygon points="5,3 17,10 5,17" fill="currentColor"/>
+              </svg>
+            </button>
+          </div>
+          <div class="video-card">
+            <div class="video-card__inner">
+              <span class="video-card__label">[ VÍDEO 02 ]</span>
+            </div>
+            <button class="video-card__play" aria-label="Reproduzir vídeo">
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+                <polygon points="5,3 17,10 5,17" fill="currentColor"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="page__footer">
+        <span>[ NOME DO PROFISSIONAL ]</span>
+        <span>pág. 03</span>
+      </div>
+    </div>
+
+    <!-- ── PÁGINA: INSTITUCIONAIS ─────────────────────────── -->
+    <div class="page work-page" id="page-institucionais" role="tabpanel" aria-hidden="true">
+      <div class="page__header">
+        <span class="page__label">Institucionais</span>
+        <span class="page__date">2024</span>
+      </div>
+
+      <div class="page__body">
+        <div class="work-text">
+          <span class="work-number">03 / 04</span>
+          <h2 class="work-title">INSTITU&shy;CIONAIS</h2>
+          <p class="work-desc">
+            Vídeos para marcas, empresas e projetos que precisam comunicar com autoridade. Narrativa clara, imagem forte e mensagem que fica.
+          </p>
+          <a href="#" class="work-cta" onclick="return false">→ entrar em contato</a>
+        </div>
+
+        <div class="work-videos work-videos--row">
+          <div class="video-card">
+            <div class="video-card__inner">
+              <span class="video-card__label">[ VÍDEO 01 ]</span>
+            </div>
+            <button class="video-card__play" aria-label="Reproduzir vídeo">
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+                <polygon points="5,3 17,10 5,17" fill="currentColor"/>
+              </svg>
+            </button>
+          </div>
+          <div class="video-card">
+            <div class="video-card__inner">
+              <span class="video-card__label">[ VÍDEO 02 ]</span>
+            </div>
+            <button class="video-card__play" aria-label="Reproduzir vídeo">
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+                <polygon points="5,3 17,10 5,17" fill="currentColor"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="page__footer">
+        <span>[ NOME DO PROFISSIONAL ]</span>
+        <span>pág. 04</span>
+      </div>
+    </div>
+
+    <!-- ── PÁGINA: REDES ──────────────────────────────────── -->
+    <div class="page work-page" id="page-redes" role="tabpanel" aria-hidden="true">
+      <div class="page__header">
+        <span class="page__label">Redes Sociais</span>
+        <span class="page__date">2024</span>
+      </div>
+
+      <div class="page__body">
+        <div class="work-text">
+          <span class="work-number">04 / 04</span>
+          <h2 class="work-title">REDES SOCIAIS</h2>
+          <p class="work-desc">
+            Conteúdo pensado para parar o scroll. Reels, Shorts e vídeos verticais criados com ritmo, estética e identidade para marcas e creators.
+          </p>
+          <a href="#" class="work-cta" onclick="return false">→ entrar em contato</a>
+        </div>
+
+        <div class="work-videos work-videos--row">
+          <div class="video-card">
+            <div class="video-card__inner">
+              <span class="video-card__label">[ VÍDEO 01 ]</span>
+            </div>
+            <button class="video-card__play" aria-label="Reproduzir vídeo">
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+                <polygon points="5,3 17,10 5,17" fill="currentColor"/>
+              </svg>
+            </button>
+          </div>
+          <div class="video-card">
+            <div class="video-card__inner">
+              <span class="video-card__label">[ VÍDEO 02 ]</span>
+            </div>
+            <button class="video-card__play" aria-label="Reproduzir vídeo">
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+                <polygon points="5,3 17,10 5,17" fill="currentColor"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="page__footer">
+        <span>[ NOME DO PROFISSIONAL ]</span>
+        <span>pág. 05</span>
+      </div>
+    </div>
+
+    <!-- ── PÁGINA: SOBRE ──────────────────────────────────── -->
+    <div class="page" id="page-sobre" role="tabpanel" aria-hidden="true">
+      <div class="page__header">
+        <span class="page__label">Sobre</span>
+        <span class="page__date">Bio</span>
+      </div>
+
+      <div class="page__body">
+        <div class="about-photo-slot">
+          <div class="about-tape" aria-hidden="true"></div>
+          <div class="about-photo-frame">
+            <!-- Substitua por: <img src="foto.jpg" alt="Foto"/> -->
+            <span class="about-photo-label">[ FOTO ]</span>
+          </div>
+        </div>
+
+        <div class="about-text-area">
+          <h2 class="about-title">Quem sou</h2>
+          <p class="about-body">
+            [ NOME DO PROFISSIONAL ] é videomaker e creator baseado em [ CIDADE ]. Com foco em narrativa visual e direção de arte, traduz histórias reais em imagens que emocionam e comunicam.
+          </p>
+          <p class="about-body">
+            Cada projeto é tratado como uma obra única — com atenção ao detalhe, sensibilidade ao momento e comprometimento com o resultado final.
+          </p>
+          <div class="about-tags">
+            <span class="about-tag">Videomaker</span>
+            <span class="about-tag">Creator</span>
+            <span class="about-tag">Dir. de Arte</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="page__footer">
+        <span>[ NOME DO PROFISSIONAL ]</span>
+        <span>pág. 06</span>
+      </div>
+    </div>
+
+    <!-- ── PÁGINA: CONTATO ────────────────────────────────── -->
+    <div class="page" id="page-contato" role="tabpanel" aria-hidden="true">
+      <div class="page__header">
+        <span class="page__label">Contato</span>
+        <span class="page__date">Vamos conversar</span>
+      </div>
+
+      <div class="page__body">
+        <p class="contact-eyebrow">Tem um projeto? Vamos trabalhar juntos.</p>
+        <h2 class="contact-title">FALA<br/>COMIGO.</h2>
+
+        <div class="contact-list">
+          <a href="https://wa.me/[NUMERO]" class="contact-item" target="_blank" rel="noopener">
+            <span class="contact-item__arrow">→</span>
+            <span class="contact-item__label">WhatsApp</span>
+            <span class="contact-item__value">[ WHATSAPP ]</span>
+          </a>
+          <a href="https://instagram.com/[INSTAGRAM]" class="contact-item" target="_blank" rel="noopener">
+            <span class="contact-item__arrow">→</span>
+            <span class="contact-item__label">Instagram</span>
+            <span class="contact-item__value">@[ INSTAGRAM ]</span>
+          </a>
+          <a href="mailto:[EMAIL]" class="contact-item">
+            <span class="contact-item__arrow">→</span>
+            <span class="contact-item__label">E-mail</span>
+            <span class="contact-item__value">[ E-MAIL ]</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="page__footer">
+        <span>[ NOME DO PROFISSIONAL ]</span>
+        <span>pág. 07</span>
+      </div>
+    </div>
+
+  </div><!-- /pages -->
+</div><!-- /notebook -->
+
+<script>
+(function () {
+  'use strict';
+
+  const tabs  = document.querySelectorAll('.tab');
+  const pages = document.querySelectorAll('.page');
+
+  function showPage(id) {
+    pages.forEach(p => {
+      p.classList.remove('is-active', 'flip-in');
+      p.setAttribute('aria-hidden', 'true');
+    });
+
+    tabs.forEach(t => {
+      t.classList.remove('is-active');
+      t.setAttribute('aria-selected', 'false');
+    });
+
+    const target = document.getElementById('page-' + id);
+    const activeTab = document.querySelector(`.tab[data-page="${id}"]`);
+
+    if (target) {
+      target.classList.add('is-active');
+      target.removeAttribute('aria-hidden');
+      // Trigger reflow for animation
+      void target.offsetWidth;
+      target.classList.add('flip-in');
+    }
+    if (activeTab) {
+      activeTab.classList.add('is-active');
+      activeTab.setAttribute('aria-selected', 'true');
+    }
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => showPage(tab.dataset.page));
+  });
+
+  // Keyboard nav between tabs
+  tabs.forEach((tab, i) => {
+    tab.addEventListener('keydown', e => {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        const next = tabs[(i + 1) % tabs.length];
+        next.focus();
+        showPage(next.dataset.page);
+      }
+      if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+        e.preventDefault();
+        const prev = tabs[(i - 1 + tabs.length) % tabs.length];
+        prev.focus();
+        showPage(prev.dataset.page);
+      }
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
